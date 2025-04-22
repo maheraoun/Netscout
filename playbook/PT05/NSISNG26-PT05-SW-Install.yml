@@ -33,7 +33,7 @@
           ".*DO YOU ACCEPT.*": "y"
           ".*Also enable support for ASI.*": "y"
           ".*Enable local Geo configuration.*": "y"
-          ".*Please enter the probe name.*": "NSISNG14-SLNT"
+          ".*Please enter the probe name.*": "NSISNG26-PT05"
           ".*Please enter the external NAT IP.*": ""
           ".*Enter 0 to eliminate this partition.*": "38794" 
           ".*Enter an integer between 25 GB and 6466 GB.*": "50"
