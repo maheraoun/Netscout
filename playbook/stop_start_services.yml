@@ -1,0 +1,19 @@
+---
+- name: Run NetScout installer with inline Expect
+  hosts: all
+  become: true
+  tasks:
+
+    - name: Stop NetScout service
+      ansible.builtin.shell: ./stopall
+      args:
+        chdir: /opt/NetScout/rtm/bin
+        executable: /bin/bash
+
+
+    - name: Start NetScout service
+      ansible.builtin.shell: ./start
+      args:
+        chdir: /opt/NetScout/rtm/bin
+        executable: /bin/bash
+

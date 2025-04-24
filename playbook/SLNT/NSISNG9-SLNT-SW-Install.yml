@@ -1,0 +1,57 @@
+- name: Run NetScout installer 
+  hosts: 10.214.224.70
+  become: true
+  tasks:
+
+    - name: Create  /etc/resolv.conf
+      ansible.builtin.copy:
+        dest: /etc/resolv.conf
+        content: |
+          search osn.wireless.rogers.com
+          nameserver 172.19.255.100
+          nameserver 172.19.255.101
+        owner: root
+        group: root
+
+    - name: Ensure expect is installed on remote host
+      ansible.builtin.package:
+        name: expect
+        state: present
+
+#    - name: Copy isgeo installer to remote host
+#      ansible.builtin.copy:
+#        src: /home/maher.aoun/Netscout/isgeo-6400-1790-eth-M.bin
+#        dest: /opt/isgeo-6400-1790-eth-M.bin
+#        mode: '0755'
+
+    - name: Run the interactive installer with all expected prompts
+      ansible.builtin.expect:
+        command: "/opt/isgeo-6400-1790-eth-M.bin"
+        responses:
+          ".*CHOOSE LOCALE BY NUMBER.*": "2"
+          ".*PRESS <ENTER> TO CONTINUE.*": "\r"     # 1st: Before license
+          ".*PRESS <ENTER> TO CONTINUE.*": "\r"     # 2nd: License page 1
+          ".*PRESS <ENTER> TO CONTINUE.*": "\r"     # 3rd: License page 2
+          ".*PRESS <ENTER> TO CONTINUE.*": "\r"     # 4th: License page 3
+          ".*PRESS <ENTER> TO CONTINUE.*": "\r"     # 5th: License page 4
+          ".*PRESS <ENTER> TO CONTINUE.*": "\r"     # 6th: License page 5
+          ".*DO YOU ACCEPT.*": "y"
+          ".*Also enable support for ASI.*": "y"
+          ".*Enable local Geo configuration.*": "y"
+          ".*Please enter the probe name.*": "NSISNG9-SLNT"
+          ".*Please enter the external NAT IP.*": ""
+          ".*Enter 0 to eliminate this partition.*": "38794" 
+          ".*Enter an integer between 25 GB and 6466 GB.*": "50"
+          ".*Enter integer between 25 GB and 6466 GB.*": "50"
+          ".*Enter integer between 1293 GB and 64657 GB.*": "64657"
+          ".*Enter integer between 64657 GB and 64657 GB.*": "64657"
+          ".*Please enter a percentage number between 0-95.*": "10"
+          ".*PRESS <ENTER> TO CONTINUE.*": "\r"
+          ".*PRESS <ENTER> TO EXIT.*": "\r"
+        timeout: 900
+        echo: yes
+
+    - name: Reboot the server to apply changes
+      ansible.builtin.reboot:
+        reboot_timeout: 600
+        test_command: uptime
