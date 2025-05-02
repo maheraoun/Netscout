@@ -4,15 +4,6 @@
   become: true
   tasks:
 
-    - name: Create  /etc/resolv.conf
-      ansible.builtin.copy:
-        dest: /etc/resolv.conf
-        content: |
-          search osn.wireless.rogers.com
-          nameserver 172.19.255.100
-          nameserver 172.19.255.101
-        owner: root
-        group: root
 
     - name: Ensure expect is installed on remote host
       ansible.builtin.package:
