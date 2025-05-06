@@ -29,7 +29,7 @@
       ansible.builtin.copy:
         dest: /etc/hosts
         content: |
-          172.21.131.119 NSISNG16-ED2.osn.wireless.rogers.com NSISNG16-ED2
+          172.21.213.135 NSISNG16-ED2.osn.wireless.rogers.com NSISNG16-ED2
           127.0.0.1 NSISNG16-ED2 localhost.localdomain localhost
         owner: root
         group: root
