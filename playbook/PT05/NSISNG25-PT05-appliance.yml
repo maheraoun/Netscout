@@ -1,1 +1,72 @@
+---
+- name: Update system configuration
+  hosts: 10.214.117.109
+  become: true
+  tasks:
 
+    # Update etc/resolv.conf
+    - name: Create  /etc/resolv.conf
+      ansible.builtin.copy:
+        dest: /etc/resolv.conf
+        content: |
+          search osn.wireless.rogers.com
+          nameserver 172.19.255.100
+          nameserver 172.19.255.101
+        owner: root
+        group: root
+
+    # Update /etc/hostname
+    - name: Replace content of /etc/hostname
+      ansible.builtin.copy:
+        dest: /etc/hostname
+        content: "NSISNG25-PT05\n"
+        owner: root
+        group: root
+        mode: '0644'
+
+    # Update /etc/hosts
+    - name: Replace content of /etc/hosts
+      ansible.builtin.copy:
+        dest: /etc/hosts
+        content: |
+          10.214.117.109 NSISNG25-PT05.osn.wireless.rogers.com NSISNG25-PT05
+          127.0.0.1 NSISNG25-PT05 localhost.localdomain localhost
+        owner: root
+        group: root
+        mode: '0644'
+
+    # Ensure the hostname is correct after updating
+    - name: Ensure the hostname is correct after updating
+      ansible.builtin.hostname:
+        name: NSISNG25-PT05
+
+    # Modify /etc/chrony.conf
+    - name: Comment out 'pool 2.pool.ntp.org iburst' in /etc/chrony.conf
+      ansible.builtin.lineinfile:
+        path: /etc/chrony.conf
+        regexp: '^pool 2.pool.ntp.org iburst'
+        line: '#pool 2.pool.ntp.org iburst'
+        state: present
+
+    - name: Add NTP servers under the comment in /etc/chrony.conf
+      ansible.builtin.lineinfile:
+        path: /etc/chrony.conf
+        line: 'server 172.21.52.51 iburst'
+        insertafter: '^#pool 2.pool.ntp.org iburst'
+
+    - name: Add another NTP server in /etc/chrony.conf
+      ansible.builtin.lineinfile:
+        path: /etc/chrony.conf
+        line: 'server 172.19.254.12 iburst'
+        insertafter: 'server 172.21.52.51 iburst'
+
+    # Set timezone to US/Eastern
+    - name: Set timezone to US/Eastern
+      ansible.builtin.command:
+        cmd: timedatectl set-timezone US/Eastern
+
+    # Reboot the server
+    - name: Reboot the server to apply changes
+      ansible.builtin.reboot:
+        reboot_timeout: 600
+        test_command: uptime
